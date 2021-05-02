@@ -1,10 +1,8 @@
-# Import Splinter, BeautifulSoup, and Pandas
 from splinter import Browser
 from bs4 import BeautifulSoup as soup
 import pandas as pd
 import datetime as dt
 from webdriver_manager.chrome import ChromeDriverManager
-
 
 def scrape_all():
     # Initiate headless driver for deployment
@@ -12,6 +10,8 @@ def scrape_all():
     browser = Browser('chrome', **executable_path, headless=True)
 
     news_title, news_paragraph = mars_news(browser)
+    #hemispheres = hemisphere(browser)
+
 
     # Run all scraping functions and store results in a dictionary
     data = {
@@ -19,7 +19,8 @@ def scrape_all():
         "news_paragraph": news_paragraph,
         "featured_image": featured_image(browser),
         "facts": mars_facts(),
-        "last_modified": dt.datetime.now()
+        "last_modified": dt.datetime.now(),
+        "hemispheres": hemisphere(browser)
     }
 
     # Stop webdriver and return data
@@ -97,7 +98,99 @@ def mars_facts():
     # Convert dataframe into HTML format, add bootstrap
     return df.to_html(classes="table table-striped")
 
-if __name__ == "__main__":
+def hemisphere(browser):
+    url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+    browser.visit(url)
 
-    # If running as script, print scraped data
+    # 2. Create a list to hold the images and titles.
+    # HTML Object
+    html_hemispheres = browser.html
+
+    # Parse HTML with Beautiful Soup
+    image_soup = soup(html_hemispheres, 'html.parser')
+
+    # Retreive all items that contain mars hemispheres information
+    #results = image_soup.find_all('div', class_='collapsible results')
+
+    prac = image_soup.body.find_all('h3')
+
+    title = []
+
+    for pr in prac:
+        title.append(pr.text)
+
+    #title
+
+    # Create empty list for hemisphere urls 
+    #hemisphere_image_urls = []
+
+    thumbnail_results = image_soup.body.find_all('a', class_ = 'itemLink product-item')
+    thumbnail_links = []
+
+    for thumbnail in thumbnail_results:
+    
+        # If the thumbnail element has an image...
+        if (thumbnail.img):
+        
+        # then grab the attached link
+            thumbnail_url = 'https://astrogeology.usgs.gov' + thumbnail['href']
+        
+        # Append list with links
+            thumbnail_links.append(thumbnail_url)
+
+    #thumbnail_links
+
+    # Store the main_ul 
+    #hemisphere_url = 'https://astrogeology.usgs.gov'
+
+    # Loop through the items previously stored
+    #for result in results: 
+    
+    
+    
+    # Store link that leads to full image website
+    
+    img_url = []    
+    
+    # Visit the link that contains the full image website 
+    for urls in thumbnail_links:
+        
+        browser.visit(urls)
+    
+        # HTML Object of individual hemisphere information website 
+        partial_img_html = browser.html
+    
+        # Parse HTML with Beautiful Soup for every individual hemisphere information website 
+        parse = soup(partial_img_html, 'html.parser')
+            
+        # Retrieve full image source 
+        img_urls = parse.body.find('a', text = 'Sample')['href']
+        img_url.append(img_urls)
+        
+    mars_hemi_zip = zip(title, img_url)
+
+    hemispheres = []
+
+        # Iterate through the zipped object
+    for titles, img in mars_hemi_zip:
+    
+        mars_hemi_dict = {}
+    
+            # Add hemisphere title to dictionary
+        mars_hemi_dict['title'] = titles
+    
+            # Add image url to dictionary
+        mars_hemi_dict['img_url'] = img
+    
+            # Append the list with dictionaries
+        hemispheres.append(mars_hemi_dict)
+        
+    
+    return hemispheres
+
+# 5. Quit the browser
+    #browser.quit()    
+
+
+if __name__ == "__main__":
     print(scrape_all())
