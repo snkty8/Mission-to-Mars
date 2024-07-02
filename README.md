@@ -29,3 +29,5 @@ Using python code in jupyter notebook, a function was created to parse through t
 In order to get the Mars hemisphere images, I scraped the specified URLs above. The images and URLs needed to placed into a dictionary ready for MongoDB to read.  I initially had an issue with my dictionary. The dictionary I created was not in the correct formart.  This caused MongoDB to bring up all the URLs and titles at one time, instead of one after the next.  In short, my web app did not work.  Once I fixed this problem, my web app work perfectly fine. 
 
 Secondly, I am not well versed in html.  I feel as if my app looks basic, but I was able to tweek a few things.  I was able to change the color and the scrape button.  I was also able to change the background color.  This just lets me know what I need to work on in the future.  All in all, I am proud of my progress and more than willing to work to make my work more visually appealing.  I am far from an expert in this area, but more the willing work to get there. 
+
+Tried updating the web app, but the Latest ChromeDriverManager has not been updated for the latest version on Chrome. Will have to update at a later date. 
